@@ -23,5 +23,8 @@ Graduation rates vary widely across US universitites and it isn't obvious from r
 * **Variables selection** - backwars stepwise selection, comparing RSS, adjusted R-squared, Cp and BIC
 * **Model improvement** - polynomial terms and log transformations to address non-linearity and diagnostics.
 
+### Files
+
+[view the cvs file] College.csv
 
    
