@@ -32,4 +32,8 @@ Graduation rates vary widely across US universitites and it isn't obvious from r
 | [`College.csv`](College.csv)                                                       | Dataset                                            |
 
 
+## Tools
+R, with the `leaps` package for stepwise variable selection.
+
+
    
