@@ -1,0 +1,284 @@
+---
+title: 'MA717: Applied Regression and Experimental Data Analysis'
+author: "Asha Deen "
+date: "12th Decemeber 2025 "
+output:
+  pdf_document: default
+  word_document: default
+  html_document:
+    df_print: paged
+---
+
+
+```{r, eval=TRUE}
+
+if(!require(leaps)) install.packages("leaps")
+library(leaps)
+
+```
+
+\textbf{Task 1: Data reading and simple exploration (25$\%$)}
+
+1.1. Read "College.csv" file into R with following command and use dim() and head() to check if you read the data correct. You should report the number of observations and the number of variables. **(5 $\%$)**
+
+```{r, eval=TRUE}
+#laoding the dataset
+mydata<-read.csv("College.csv", header=T, stringsAsFactors=TRUE)
+
+#checking if data is correct
+dim(mydata)
+head(mydata)
+
+
+
+```
+We have 755 observations and 17 variables
+
+
+1.2. Use your registration number as random seed, generate a random subset of College data with sample size 700, name this new data as mynewdata. Use summary() to output the summarized information about mynewdata. Please report the number of private and public university and the number of Elite university and non-Elite university in this new data. **(12 $\%$)** 
+
+```{r, eval=TRUE}
+#setting up the random seed
+set.seed(2501218)
+#generating random subset of size 700
+index<- sample(775, size = 700)
+mynewdata <- mydata[index,]
+#summarised information about mynewdata
+summary(mynewdata)
+```
+
+Number of private uni is 511 and public uni is 189.Elite universities are 631 and non Elite universities are 69.
+
+1.3. Use mynewdata, plot histogram plots of four variables "Outstate", "Room.Board", "Books" and "Personal". Give each plot a suitable title and label for x axis and y axis. **(8$\%$)**
+
+```{r, eval=TRUE}
+#setting x as Outstate,y as Room.Board,z as Books and i as Personal
+x <- mynewdata$Outstate
+y <- mynewdata$Room.Board
+z <- mynewdata$Books
+i <- mynewdata$Personal
+
+
+#Plotting Outstate histogram
+hist(x, main = "Outstate histogram by frequency",xlab="Outstate",ylab = "Frequency")
+
+#Plotting Room board histogram
+hist(y, main = "Room board histogram by frequency",xlab="Room.Board",ylab = "Frequency")
+
+#Plotting Books histogram
+hist(z, main = "Books histogram by frequency",xlab="Books",ylab = "Frequency")
+
+#Plotting Personal histogram
+hist(i, main = "Personal histogram by frequency",xlab="Personal",ylab = "Frequency")
+
+
+
+```
+
+
+
+
+\textbf{Task 2: Linear regression (45$\%$)}
+
+2.1. Use mynewdata, do a linear regression fitting when outcome is "Grad.Rate" and predictors are "Private" and "Elite". Show the R output and report what you have learned from this output (you need to discuss significance, adjusted R-squared and p-value of F-statistics). **(6$\%$)**. 
+
+```{r, eval=TRUE}
+#using linear regression to fit the data and summary the output
+myfit.sim = lm(Grad.Rate~Private+Elite ,data = mynewdata )
+summary(myfit.sim)
+
+```
+Private and Elite are statistically significant since the p-value is 2.2e-16 which is less than the alpha value 0.05.
+
+ Private and Elite explains about 22 percent of the variability of graduation rate
+ 
+p-value of F test is smaller than 0.05, so the fitted model is better than null model.
+
+2.2. Use the linear regression fitting result in 2.1, calculate the confidence intervals for the coefficients. Also give the prediction interval of "Grad.Rate" for a new data with Private="Yes" and Elite="No". **(4$\%$)**
+
+```{r, eval=TRUE}
+#calculating confidence interval for the coefficient estimates
+confint(myfit.sim)
+
+
+#prediction interval
+predict(myfit.sim, newdata = data.frame(Private="Yes",Elite="No"),interval ="prediction")
+
+```
+
+2.3 Use mynewdata, do a multiple linear regression fitting when outcome is "Grad.Rate", all other variables as predictors. Show the R output and report what you have learned from this output (you need to discuss significance, adjusted R-squared and p-value of F-statistics). Is linear regression model in 2.3 better than linear regression in 2.1? Use ANOVA to justify your conclusion. **(14\%)** 
+
+```{r, eval=TRUE}
+#all model, to include all other variables as predictors
+myfit.all <-lm(Grad.Rate~.,data = mynewdata)
+summary(myfit.all)
+
+#analysis of variance 
+anova(myfit.sim, myfit.all)
+```
+
+myfit.all explains about **45 percent** of the variance in graduation rate,which is roughly double the variance explained by the simple model with Elite and Private variables as the only predictors.
+myfit.all's **p-value of F test is smaller than 0.05**, so the all fitted model is better than null model.
+In myfit.all several variables are significant,this include  Apps, P.Undergrad, Outstate, PhD,perc.alumni,Private, Room.Board.Other variables such as Enroll,Accept,F.Undergrad,Books, Terminal,Elite and S.F.Ratio are not significant.
+
+myfit.all (model 2) with all variables as predictors is **better** than myfit.sim(model 1) with only Elite and private as predictors.
+This is clear with the ANOVA comparison between them , showing a very small p_value of 2.2e-16 ,meaning the myfit.all is significantly better than myfit.sim.
+
+
+2.4. Use the diagnostic plots to look at the fitting of multiple linear regression in 2.3. Please comment what you have seen from those plots. **(7\%)** 
+
+```{r, eval=TRUE}
+#diagnostic plots
+plot(myfit.all)
+
+```
+
+Findings from diagnostics plot for myfit.all (model 2): 
+The residual plot, the red smoothing fitting line appears to be slightly curved and we have outliers in our data.scale-Location plot, the red smoothing line is curved and this might suggest violation of homoscedasticity assumption.the QQ plot shows the normal distribution assumption for residuals is not fully satisfied and the leverage plot indicates there are some high influence (high leverage) points.
+
+
+2.5. Use mynewdata, do a variable selection to choose the best model. You should use plots to justify how do you choose your best model. Use the selected predictors of your best model with outcome "Grad.Rate", do a linear regression fitting and plot the diagnostic plots for this fitting. You can use either exhaustive, or forward, or backward selection method. **(14\%)**
+
+
+
+```{r, eval=TRUE}
+#model selection using backward selection method
+
+myfit.bwd<-regsubsets(Grad.Rate~., data=mynewdata, nvmax=16,method="backward")
+myfit.bwd.sum<-summary(myfit.bwd)
+
+#Plots to justify the decision of choosing the best model
+
+plot(myfit.bwd.sum$rss, xlab="Variable number", ylab="RSS", type="l")
+plot(myfit.bwd.sum$adjr2, xlab="Variable number", ylab="Adjust R-squared", type="l")
+plot(myfit.bwd.sum$cp, xlab="Variable number", ylab="Cp", type="l")
+plot(myfit.bwd.sum$bic, xlab="Variable number", ylab="BIC", type="l")
+
+
+
+```
+From plot RSS  Cp and BIC are all decreasing and adjusted R-squared is increasing.We will use which.min() or which.max() to check the best model.
+
+
+```{r, eval=TRUE}
+
+#check which model gives the maximum adjusted R-squared
+which.max(myfit.bwd.sum$adjr2)
+#check which model gives the minimum cp
+which.min(myfit.bwd.sum$cp)
+#check which model gives the minimum cp
+which.min(myfit.bwd.sum$bic)
+which.min(myfit.bwd.sum$rss)
+
+```
+Adjusted R-squared is the largest when variable number is 12, cp is the smallest when variable number is 11 and BIC is the smallest when variable number is 6.
+We will choose the model that uses the least number of variables.We will select model 6 by BIC.
+
+```{r, eval=TRUE}
+#Looking at the predictors selected by BIC
+coef(myfit.bwd, 6)
+
+```
+The variables selected are Apps,P.Undergrad,Outstate,Room.Board, PhD and perc.alumni
+```{r, eval=TRUE}
+#using linear regression to fit Grad.Rate with the 6 variables selected
+myfit.best = lm(Grad.Rate~Apps+P.Undergrad+Outstate+Room.Board+PhD+perc.alumni,data = mynewdata)
+summary(myfit.best)
+
+```
+```{r, eval=TRUE}
+#diagnostic plots
+plot(myfit.best)
+
+```
+
+Findings from diagnostics plot for myfit.best (model 3): 
+The plots are almost similar to the plot in myfit.all 
+
+
+\textbf{Task 3: Open question (30$\%$)}
+
+Use mynewdata, discuss and perform any step(s) that you think that can improve the fitting in Task 2. You need to illustrate your work by using the R codes, output and discussion.
+
+
+The diagnostic plots suggested that there might be non linearity in our data,we are going to use polynomial regression to capture the complex patterns and log transformations
+
+```{r, eval=TRUE}
+#Exploring Degree-2 Polynomial Regression for model improvement
+myfit.pol<-lm(Grad.Rate ~ poly(Apps, 2, raw=T)+poly(Outstate, 2, raw=T)+poly(P.Undergrad, 2, raw=T)
++poly(Room.Board, 2, raw=T)+poly(PhD, 2, raw=T)+poly(perc.alumni, 2, raw=T),data=mynewdata)
+
+summary(myfit.pol)
+
+```
+
+```{r, eval=TRUE}
+#diagnostic plots for myfit.pol
+plot(myfit.pol)
+
+```
+No improvement
+```{r, eval=TRUE}
+#anova between myfit all and myfit pol
+anova(myfit.all,myfit.pol)
+
+```
+Comparing polynomial model and the multiple linear regression model,there is no significant improvement in the model.
+
+we are going to mix polynomial and linear regression and see if it will improve our model.
+```{r, eval=TRUE}
+# Mixed model with polynomial for some predictors and linear for some
+myfit.mixed <- lm(Grad.Rate ~ poly(Apps, 3, raw = TRUE) +
+                               Outstate +
+                               poly(P.Undergrad, 3, raw = TRUE) +
+                               Room.Board +
+                               PhD +
+                               poly(perc.alumni, 2, raw = TRUE) +
+                               Private + Elite,
+                  data = mynewdata)
+
+summary(myfit.mixed)
+
+```
+
+
+```{r, eval=TRUE}
+#diagnostic plots of mixed model
+plot(myfit.mixed)
+
+```
+slight improvement
+```{r, eval=TRUE}
+#anova of myfit.all and myfit.mixed models
+anova(myfit.all,myfit.mixed)
+```
+There is a slight improvement
+
+
+```{r, eval=TRUE}
+#applying log transformation to Apps and Outstate to reduce skewness and fitting a polynomial regression model
+mynewdata$Apps <- log(mynewdata$Apps + 1 )
+mynewdata$Outstate <- log(mynewdata$Outstate + 1)
+myfit.transformed <- lm(Grad.Rate ~ poly(Apps, 2, raw=TRUE) + 
+                                       poly(P.Undergrad, 2, raw=TRUE) +
+                                       Outstate + Room.Board + PhD + perc.alumni +
+                                       Private + Elite, data=mynewdata)
+summary(myfit.transformed)
+
+
+```
+```{r, eval=TRUE}
+#diagnostic plot of myfit.transformed
+plot(myfit.transformed)
+
+```
+slight improvement 
+```{r, eval=TRUE}
+#comparing myfit.all model and myfit.transformed model
+anova(myfit.transformed,myfit.all)
+
+```
+The myfit.transformed model is simpler and achieves a slightly higher adjusted R-squared, indicating a modest improvement in explanatory power. The diagnostic plots also suggest a minor improvement in fit. Additionally, the model is highly significant, with an F-statistic p-value < 2.2e-16.
+
+
+
