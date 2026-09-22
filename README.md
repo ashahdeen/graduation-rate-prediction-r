@@ -17,11 +17,11 @@ Graduation rates vary widely across US universitites and it isn't obvious from r
 
 ## Approach
 
-**Exploratoty analysis** - summarising and visualisaing key financial and institutional variables.
-**Linear regression** - from a simple two-predictor model up to a full 16 predictor model, compared formally with ANOVA.
-**Model diagnostics** - residual vs. fitted, Q-Q, scale-location and leverage /Cook's distance plots to check assumptions and flag influential points.
-**Variables selection** - backwars stepwise selection, comparing RSS, adjusted R-squared, Cp and BIC
-**Model improvement** - polynomial terms and log transformations to address non-linearity and diagnostics.
+* **Exploratoty analysis** - summarising and visualisaing key financial and institutional variables.
+* **Linear regression** - from a simple two-predictor model up to a full 16 predictor model, compared formally with ANOVA.
+* **Model diagnostics** - residual vs. fitted, Q-Q, scale-location and leverage /Cook's distance plots to check assumptions and flag influential points.
+* **Variables selection** - backwars stepwise selection, comparing RSS, adjusted R-squared, Cp and BIC
+* **Model improvement** - polynomial terms and log transformations to address non-linearity and diagnostics.
 
 
    
