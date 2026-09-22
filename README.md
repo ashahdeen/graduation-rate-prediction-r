@@ -25,6 +25,6 @@ Graduation rates vary widely across US universitites and it isn't obvious from r
 
 ### Files
 
-[view the cvs file] College.csv
+[`College.csv`](data/College.csv)
 
    
