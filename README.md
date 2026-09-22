@@ -27,7 +27,7 @@ Graduation rates vary widely across US universitites and it isn't obvious from r
 
 | File                                                                               | Description                                        |
 | ---------------------------------------------------------------------------------- | -------------------------------------------------- |
-| [`MA717.Rmd`](MA717.Rmd)                                                           | R Markdown source — all code, output, and analysis |
+| [`MA717.Rmd`](MA717.Rmd)                                                           | R Markdown source. All code, output and analysis |
 | [`college-graduation-rate-regression.pdf`](college-graduation-rate-regression.pdf) | Knitted output                                     |
 | [`College.csv`](College.csv)                                                       | Dataset                                            |
 
